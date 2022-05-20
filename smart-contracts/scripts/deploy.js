@@ -1,4 +1,4 @@
-const { ethers } = require('hardhat');
+const { ethers, network } = require('hardhat');
 const {
   KECCAK_NFT_CONTRACT_NAME,
   TOKEN_BASE_URI,
@@ -73,7 +73,7 @@ const test = async (topic, keccakNFT, keccakDAO, addresses) => {
   // const voteTx2 = await keccakDAO.connect(bob).voteOnProposal(proposalId.toString(),0);
   // await voteTx2.wait(1);
   
-  await delay(5000);  // --> kept the default delay of 5 seconds
+  await network.provider.send("evm_increaseTime", [5000])  // --> kept the default delay of 5 seconds
   //execute proposal
   const executeTx = await keccakDAO.connect(owner).executeProposal(proposalId.toString());
   const erc = await executeTx.wait(1);
