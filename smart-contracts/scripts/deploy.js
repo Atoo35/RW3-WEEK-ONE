@@ -22,7 +22,7 @@ const main = async () => {
   );
   await keccakNFT.deployed()
   // console.log(`Balance of owner: ${ethers.utils.formatEther(await ethers.provider.getBalance(owner.address))}`)
-  console.log(`Contract deployed at address: ${keccakNFT.address}`);
+  console.log(`Keccak NFT contract deployed at address: ${keccakNFT.address}`);
   
   //deploy box contract
   const boxContract = await ethers.getContractFactory(BOX_CONTRACT_NAME);
@@ -33,14 +33,14 @@ const main = async () => {
     console.log(`Box value changed to ${value}`)
   })
 
-  console.log(`Contract deployed at address: ${box.address}`);
+  console.log(`Box contract deployed at address: ${box.address}`);
 
   
   //deploy dao
   const keccakDAOContract = await ethers.getContractFactory(DAO_CONTRACT_NAME);
   const keccakDAO = await keccakDAOContract.deploy(box.address, keccakNFT.address);
   await keccakDAO.deployed();
-  console.log(`Contract deployed at address: ${keccakDAO.address}`);
+  console.log(`Keccak DAO contract deployed at address: ${keccakDAO.address}`);
 
   //comment out while deploying to test net
   await test(box, keccakNFT, keccakDAO, [owner, alice, bob])
