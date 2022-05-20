@@ -10,6 +10,8 @@ contract KeccakDAO is Ownable{
   IBox box;
   IKeccakNFT keccakNFT;
   event ProposalCreated(uint256 proposalId, uint256 value);
+  event ProposalExecutedSuccessfully(uint256 proposalId, uint256 value);
+  event ProposalDenied(uint256 proposalId, uint256 value);
   uint256 public numProposals;
   struct Proposal{
     uint boxValue;
@@ -94,25 +96,25 @@ contract KeccakDAO is Ownable{
   }
 
   function executeProposal(uint256 proposalIndex)
-        external
-        nftHolderOnly
-        inactiveProposalOnly(proposalIndex)
-    {
-        Proposal storage proposal = proposals[proposalIndex];
+    external
+    nftHolderOnly
+    inactiveProposalOnly(proposalIndex)
+  {
+    Proposal storage proposal = proposals[proposalIndex];
 
-        if (proposal.agree > proposal.disagree) {
-            uint256 boxValue = proposal.boxValue;
-            // require(address(this).balance >= boxValue, "NOT_ENOUGH_FUNDS");
-            // nftMarketplace.purchase{value: boxValue}(proposal.nftTokenId);
-            box.store(boxValue);
-        }
-        proposal.executed = true;
+    if (proposal.agree > proposal.disagree) {
+        box.store(proposal.boxValue);
+        emit ProposalExecutedSuccessfully(proposalIndex, proposal.boxValue);
+    } else {
+        emit ProposalDenied(proposalIndex, proposal.boxValue);
     }
+    proposal.executed = true;
+  }
 
-    /// @dev withdrawEther allows the contract owner (deployer) to withdraw the ETH from the contract
-    function withdrawEther() external onlyOwner {
-        payable(owner()).transfer(address(this).balance);
-    }
+  /// @dev withdrawEther allows the contract owner (deployer) to withdraw the ETH from the contract
+  function withdrawEther() external onlyOwner {
+      payable(owner()).transfer(address(this).balance);
+  }
 
     // The following two functions allow the contract to accept ETH deposits directly
     // from a wallet without calling a function
