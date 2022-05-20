@@ -3,7 +3,9 @@ const {
   KECCAK_NFT_CONTRACT_NAME,
   TOKEN_BASE_URI,
   NFT_NAME,
-  NFT_SYMBOL
+  NFT_SYMBOL,
+  BOX_CONTRACT_NAME,
+  DAO_CONTRACT_NAME
 } = require('../constants')
 
 
@@ -23,7 +25,7 @@ const main = async () => {
   console.log(`Contract deployed at address: ${keccakNFT.address}`);
   
   //deploy box contract
-  const boxContract = await ethers.getContractFactory('Box');
+  const boxContract = await ethers.getContractFactory(BOX_CONTRACT_NAME);
   const box = await boxContract.deploy();
   await box.deployed();
   box.on('ValueChanged',(value)=>{
@@ -35,7 +37,7 @@ const main = async () => {
 
   
   //deploy dao
-  const keccakDAOContract = await ethers.getContractFactory('KeccakDAO');
+  const keccakDAOContract = await ethers.getContractFactory(DAO_CONTRACT_NAME);
   const keccakDAO = await keccakDAOContract.deploy(box.address, keccakNFT.address);
   await keccakDAO.deployed();
   console.log(`Contract deployed at address: ${keccakDAO.address}`);
