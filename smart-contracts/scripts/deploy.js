@@ -13,7 +13,7 @@ const main = async () => {
   const [owner, alice, bob] = await ethers.getSigners();
   console.log(`Owner: ${owner.address}\nAlice: ${alice.address}\nBob: ${bob.address}`)
   const keccakNFTContract = await ethers.getContractFactory(KECCAK_NFT_CONTRACT_NAME);
-  const keccakNFT = await keccakNFTContract.connect(owner).deploy(
+  const keccakNFT = await keccakNFTContract.deploy(
     TOKEN_BASE_URI,
     NFT_NAME,
     NFT_SYMBOL
@@ -24,7 +24,7 @@ const main = async () => {
   
   //deploy box contract
   const boxContract = await ethers.getContractFactory('Box');
-  const box = await boxContract.connect(owner).deploy();
+  const box = await boxContract.deploy();
   await box.deployed();
   box.on('ValueChanged',(value)=>{
     console.log('in listen event')
@@ -36,7 +36,7 @@ const main = async () => {
   
   //deploy dao
   const keccakDAOContract = await ethers.getContractFactory('KeccakDAO');
-  const keccakDAO = await keccakDAOContract.connect(owner).deploy(box.address, keccakNFT.address);
+  const keccakDAO = await keccakDAOContract.deploy(box.address, keccakNFT.address);
   await keccakDAO.deployed();
   console.log(`Contract deployed at address: ${keccakDAO.address}`);
 
