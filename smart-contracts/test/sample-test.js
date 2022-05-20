@@ -1,19 +1,28 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
+const {
+  KECCAK_NFT_CONTRACT_NAME,
+  TOKEN_BASE_URI,
+  NFT_NAME,
+  NFT_SYMBOL,
+  BOX_CONTRACT_NAME,
+  DAO_CONTRACT_NAME
+} = require("../constants");
 
-describe("Greeter", function () {
-  it("Should return the new greeting once it's changed", async function () {
-    const Greeter = await ethers.getContractFactory("Greeter");
-    const greeter = await Greeter.deploy("Hello, world!");
-    await greeter.deployed();
 
-    expect(await greeter.greet()).to.equal("Hello, world!");
+describe("Box", function () {
+  it("Should return the new value once it's changed", async function () {
+    const boxContract = await ethers.getContractFactory(BOX_CONTRACT_NAME);
+    const box = await boxContract.deploy();
+    await box.deployed();
 
-    const setGreetingTx = await greeter.setGreeting("Hola, mundo!");
+    expect(await box.getValue()).to.equal(0);
 
-    // wait until the transaction is mined
-    await setGreetingTx.wait();
+    const changeValue = await box.store(77);
 
-    expect(await greeter.greet()).to.equal("Hola, mundo!");
+    // // wait until the transaction is mined
+    await changeValue.wait(1);
+
+    expect(await box.getValue()).to.equal(77);
   });
 });

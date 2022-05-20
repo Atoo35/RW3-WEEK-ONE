@@ -4,7 +4,7 @@ const {
   TOKEN_BASE_URI,
   NFT_NAME,
   NFT_SYMBOL,
-  BOX_CONTRACT_NAME,
+  TOPIC_CONTRACT_NAME,
   DAO_CONTRACT_NAME
 } = require('../constants')
 
@@ -25,29 +25,29 @@ const main = async () => {
   console.log(`Keccak NFT contract deployed at address: ${keccakNFT.address}`);
   
   //deploy box contract
-  const boxContract = await ethers.getContractFactory(BOX_CONTRACT_NAME);
-  const box = await boxContract.deploy();
-  await box.deployed();
-  box.on('ValueChanged',(value)=>{
+  const topicContract = await ethers.getContractFactory(TOPIC_CONTRACT_NAME);
+  const topic = await topicContract.deploy();
+  await topic.deployed();
+  topic.on('ValueChanged',(value)=>{
     console.log('in listen event')
-    console.log(`Box value changed to ${value}`)
+    console.log(`Topic value changed to ${value}`)
   })
 
-  console.log(`Box contract deployed at address: ${box.address}`);
+  console.log(`Topic contract deployed at address: ${topic.address}`);
 
   
   //deploy dao
   const keccakDAOContract = await ethers.getContractFactory(DAO_CONTRACT_NAME);
-  const keccakDAO = await keccakDAOContract.deploy(box.address, keccakNFT.address);
+  const keccakDAO = await keccakDAOContract.deploy(topic.address, keccakNFT.address);
   await keccakDAO.deployed();
   console.log(`Keccak DAO contract deployed at address: ${keccakDAO.address}`);
 
   //comment out while deploying to test net
-  await test(box, keccakNFT, keccakDAO, [owner, alice, bob])
+  await test(topic, keccakNFT, keccakDAO, [owner, alice, bob])
 
 }
 
-const test = async (box, keccakNFT, keccakDAO, addresses) => {
+const test = async (topic, keccakNFT, keccakDAO, addresses) => {
 
   const [owner, alice, bob] = addresses
   //mint to owner
@@ -59,11 +59,11 @@ const test = async (box, keccakNFT, keccakDAO, addresses) => {
   console.log(`Alice nft balance: ${await keccakNFT.balanceOf(alice.address)}`)
 
   //create proposal
-  const proposalTx = await keccakDAO.connect(alice).createProposal(77);
+  const proposalTx = await keccakDAO.connect(alice).createProposal("Learn Solidity");
   const rc = await proposalTx.wait(1);
   let event = rc.events.find(event => event.event === 'ProposalCreated');
   const proposalId = event.args.proposalId
-  console.log(`Proposal value: ${event.args.value.toString()}`)
+  console.log(`Proposal value: ${event.args.newTopic}`)
 
   //vote on proposal with valid address
   const voteTx = await keccakDAO.connect(owner).voteOnProposal(proposalId.toString(),0);
@@ -79,8 +79,8 @@ const test = async (box, keccakNFT, keccakDAO, addresses) => {
   const erc = await executeTx.wait(1);
 
   //check if proposal was executed
-  const boxTx = await box.getValue();
-  console.log(`Box value: ${boxTx.toString()}`)
+  const topicTx = await topic.getTopic();
+  console.log(`Topic value: ${topicTx.toString()}`)
 }
 
 main()

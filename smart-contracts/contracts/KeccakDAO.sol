@@ -2,19 +2,19 @@
 
 pragma solidity ^0.8.4;
 
-import "./IBox.sol";
+import "./ITopic.sol";
 import "./IKeccakNFT.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract KeccakDAO is Ownable{
-  IBox box;
+  ITopic topicContract;
   IKeccakNFT keccakNFT;
-  event ProposalCreated(uint256 proposalId, uint256 value);
-  event ProposalExecutedSuccessfully(uint256 proposalId, uint256 value);
-  event ProposalDenied(uint256 proposalId, uint256 value);
+  event ProposalCreated(uint256 proposalId, string newTopic);
+  event ProposalExecutedSuccessfully(uint256 proposalId, string newTopic);
+  event ProposalDenied(uint256 proposalId, string newTopic);
   uint256 public numProposals;
   struct Proposal{
-    uint boxValue;
+    string newTopic;
     uint deadline;
     uint agree;
     uint disagree;
@@ -27,8 +27,8 @@ contract KeccakDAO is Ownable{
   }
   mapping(uint256 => Proposal) public proposals;
 
-  constructor(address _box, address _keccakNFT) payable {
-    box = IBox(_box);
+  constructor(address _topicContract, address _keccakNFT) payable {
+    topicContract = ITopic(_topicContract);
     keccakNFT = IKeccakNFT(_keccakNFT);
   }
 
@@ -57,13 +57,13 @@ contract KeccakDAO is Ownable{
     _;
   }
 
-  function createProposal(uint _boxValue) external nftHolderOnly returns(uint) {
+  function createProposal(string memory _newTopic) external nftHolderOnly returns(uint) {
     require(!proposals[numProposals].executed, "Proposal already executed.");
     Proposal storage proposal = proposals[numProposals];
-    proposal.boxValue = _boxValue;
+    proposal.newTopic = _newTopic;
     proposal.deadline = block.timestamp + 5 ;
     numProposals++;
-    emit ProposalCreated(numProposals - 1, _boxValue);
+    emit ProposalCreated(numProposals - 1, _newTopic);
     return numProposals - 1;
   }
 
@@ -103,22 +103,22 @@ contract KeccakDAO is Ownable{
     Proposal storage proposal = proposals[proposalIndex];
 
     if (proposal.agree > proposal.disagree) {
-        box.store(proposal.boxValue);
-        emit ProposalExecutedSuccessfully(proposalIndex, proposal.boxValue);
+        topicContract.storeTopic(proposal.newTopic);
+        emit ProposalExecutedSuccessfully(proposalIndex, proposal.newTopic);
     } else {
-        emit ProposalDenied(proposalIndex, proposal.boxValue);
+        emit ProposalDenied(proposalIndex, proposal.newTopic);
     }
     proposal.executed = true;
   }
 
   /// @dev withdrawEther allows the contract owner (deployer) to withdraw the ETH from the contract
-  function withdrawEther() external onlyOwner {
-      payable(owner()).transfer(address(this).balance);
-  }
+  // function withdrawEther() external onlyOwner {
+  //     payable(owner()).transfer(address(this).balance);
+  // }
 
-    // The following two functions allow the contract to accept ETH deposits directly
-    // from a wallet without calling a function
-    receive() external payable {}
+  //   // The following two functions allow the contract to accept ETH deposits directly
+  //   // from a wallet without calling a function
+  //   receive() external payable {}
 
-    fallback() external payable {}
+  //   fallback() external payable {}
 }
