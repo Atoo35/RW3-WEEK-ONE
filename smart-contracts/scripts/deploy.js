@@ -57,7 +57,7 @@ const test = async (box, keccakNFT, keccakDAO, addresses) => {
   console.log(`Alice nft balance: ${await keccakNFT.balanceOf(alice.address)}`)
 
   //create proposal
-  const proposalTx = await keccakDAO.connect(owner).createProposal(77);
+  const proposalTx = await keccakDAO.connect(alice).createProposal(77);
   const rc = await proposalTx.wait(1);
   let event = rc.events.find(event => event.event === 'ProposalCreated');
   const proposalId = event.args.proposalId
