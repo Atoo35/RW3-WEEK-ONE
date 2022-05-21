@@ -12,8 +12,8 @@ const {
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 const main = async () => {
-  const [owner, alice, bob] = await ethers.getSigners();
-  console.log(`Owner: ${owner.address}\nAlice: ${alice.address}\nBob: ${bob.address}`)
+  // const [owner, alice, bob] = await ethers.getSigners();
+  // console.log(`Owner: ${owner.address}\nAlice: ${alice.address}\nBob: ${bob.address}`)
   const keccakNFTContract = await ethers.getContractFactory(KECCAK_NFT_CONTRACT_NAME);
   const keccakNFT = await keccakNFTContract.deploy(
     TOKEN_BASE_URI,
@@ -43,7 +43,7 @@ const main = async () => {
   console.log(`Keccak DAO contract deployed at address: ${keccakDAO.address}`);
 
   //comment out while deploying to test net
-  await test(topic, keccakNFT, keccakDAO, [owner, alice, bob])
+  // await test(topic, keccakNFT, keccakDAO, [owner, alice, bob])
 
 }
 

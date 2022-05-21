@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-
+//0x286Ec26CA9f1352c526f593EAe6F8bB1e53fF977
 pragma solidity ^0.8.4;
 
 import "./ITopic.sol";
@@ -61,7 +61,7 @@ contract KeccakDAO is Ownable{
     require(!proposals[numProposals].executed, "Proposal already executed.");
     Proposal storage proposal = proposals[numProposals];
     proposal.newTopic = _newTopic;
-    proposal.deadline = block.timestamp + 5 ;
+    proposal.deadline = block.timestamp + 5 minutes ;
     numProposals++;
     emit ProposalCreated(numProposals - 1, _newTopic);
     return numProposals - 1;
