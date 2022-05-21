@@ -6,8 +6,12 @@ import abi from '../../smart-contracts/artifacts/contracts/KeccakDAO.sol';
 export default function Home() {
 
 const [currentAccount, setCurrentAccount] = useState("");
+const [proposals, setProposals] = useState([]);
+
+const contractAddress = "add contract here"
+const contractABI = abi.abi
   
-  const checkIfWalletIsConnected = async () => {
+  const isWalletConnected = async () => {
     try {
       const { ethereum } = window;
 
@@ -48,17 +52,68 @@ const [currentAccount, setCurrentAccount] = useState("");
     }
   }
 
-  const contractAddress = "0xa4d5bfa5e43b67E6f8dE8F75Ca38e019B01eA66e"
-  const contractABI = abi.abi
+  const getProposals = async () => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const KeccakDAO = new ethers.Contract(
+          contractAddress,
+          contractABI,
+          signer
+        );
+        
+        console.log("fetching proposals from the blockchain..");
+        const memos = await KeccakDAO.getProposals();
+        console.log("fetched!");
+        setMemos(memos);
+      } else {
+        console.log("Metamask is not connected");
+      }
+      
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const voteProposal = async (proposal) => {
+    // TODO
+  }
+
+  useEffect(async () => {
+    let contract;
+    isWalletConnected();
+    getProposals();
+  });
+
   
   return (
     <main>
       <h1>Road to Web3 - GOVERNANCE HACKATHON</h1>
       {currentAccount ? (
+      /* TODO show each proposal with a button to vote*/
+      <div>
         <h2>Welcome back</h2>
+        {/*
+        
+        // loop through every proposal
+        getProposals.map((proposal, index) => (
+          <div key={index} style={{border:"2px solid", "borderRadius":"5px", padding: "5px", margin: "5px"}}>
+            <p> Proposal topic: {proposal.newTopic}</p>
+            <button type="button" onClick={() => voteProposal(proposal)}>
+              Vote for this proposal!
+            </button>
+          </div>))
+        
+        
+        */}
+      
+      </div>
       ) : (
         <button onClick={connectWallet}> Connect your wallet </button>
       )}
+
     </main>
   )
 }
