@@ -8,7 +8,7 @@ export default function Home() {
 const [currentAccount, setCurrentAccount] = useState("");
 const [proposals, setProposals] = useState([]);
 
-const contractAddress = "add contract here"
+const contractAddress = "0x286Ec26CA9f1352c526f593EAe6F8bB1e53fF977"
 const contractABI = abi.abi
   
   const isWalletConnected = async () => {
@@ -65,9 +65,9 @@ const contractABI = abi.abi
         );
         
         console.log("fetching proposals from the blockchain..");
-        const memos = await KeccakDAO.getProposals();
+        const proposals = await KeccakDAO.getProposals();
         console.log("fetched!");
-        setMemos(memos);
+        setProposals(proposals);
       } else {
         console.log("Metamask is not connected");
       }
@@ -82,7 +82,6 @@ const contractABI = abi.abi
   }
 
   useEffect(async () => {
-    let contract;
     isWalletConnected();
     getProposals();
   });
@@ -98,7 +97,7 @@ const contractABI = abi.abi
         {/*
         
         // loop through every proposal
-        getProposals.map((proposal, index) => (
+        proposals.map((proposal, index) => (
           <div key={index} style={{border:"2px solid", "borderRadius":"5px", padding: "5px", margin: "5px"}}>
             <p> Proposal topic: {proposal.newTopic}</p>
             <button type="button" onClick={() => voteProposal(proposal)}>
