@@ -5,7 +5,7 @@ import { KECCAK_NFT_CONTRACT_ADDRESS } from '../utils/constants';
 import { useRouter } from 'next/router';
 import abi from '../../smart-contracts/artifacts/contracts/KeccakNFT.sol/KeccakNFT.json';
 
-export default function mintNFT(){
+export default function MintNFT(){
   const router = useRouter();
   const contractABI = abi.abi
   const [currentAccount, setCurrentAccount] = useState("");
