@@ -2,10 +2,10 @@ import {useEffect, useState} from 'react';
 import {ethers, Contract} from 'ethers';
 import {
   KECCAK_DAO_CONTRACT_ADDRESS,
-  KECCAK_NFT_CONTRACT_ADDRESS
+  KECCAK_NFT_CONTRACT_ADDRESS,
+  KECCAK_NFT_ABI,
+  KECCAK_DAO_ABI,
 } from '../utils/constants'
-import keccakDAOAbi from '../../smart-contracts/artifacts/contracts/KeccakDAO.sol/KeccakDAO.json';
-import keccackNFTAbi from '../../smart-contracts/artifacts/contracts/KeccakNFT.sol/KeccakNFT.json';
 import { useRouter } from 'next/router';
 
 export default function Home() {
@@ -15,8 +15,6 @@ const [proposals, setProposals] = useState([]);
 const [numProposals, setNumProposals] = useState("0")
 const [nftMinted, setNftMinted] = useState(false)
 const [proposalTopic, setProposalTopic] = useState("");
-const contractABI = keccakDAOAbi.abi
-const keccackNFTABI = keccackNFTAbi.abi
   
   const isWalletConnected = async () => {
     try {
@@ -67,7 +65,7 @@ const keccackNFTABI = keccackNFTAbi.abi
         const signer = provider.getSigner();
         const KeccakDAO = new ethers.Contract(
           KECCAK_DAO_CONTRACT_ADDRESS,
-          contractABI,
+          KECCAK_DAO_ABI,
           signer
         );
         
@@ -114,7 +112,7 @@ const keccackNFTABI = keccackNFTAbi.abi
         const signer = provider.getSigner();
         const KeccakDAO = new ethers.Contract(
           KECCAK_DAO_CONTRACT_ADDRESS,
-          contractABI,
+          KECCAK_DAO_ABI,
           signer
         );
         
@@ -139,7 +137,7 @@ const keccackNFTABI = keccackNFTAbi.abi
         const accounts = await ethereum.request({method: "eth_requestAccounts"})
         const KeccakNFT = new Contract(
           KECCAK_NFT_CONTRACT_ADDRESS,
-          keccackNFTABI,
+          KECCAK_NFT_ABI,
           signer
         )
         const minted = await KeccakNFT.balanceOf(accounts[0])
@@ -161,7 +159,7 @@ const keccackNFTABI = keccackNFTAbi.abi
         const signer = provider.getSigner();
         const KeccakDAO = new ethers.Contract(
           KECCAK_DAO_CONTRACT_ADDRESS,
-          contractABI,
+          KECCAK_DAO_ABI,
           signer
         );
         console.log("Creating proposal..");
@@ -190,7 +188,7 @@ const keccackNFTABI = keccackNFTAbi.abi
         const signer = provider.getSigner();
         const KeccakDAO = new ethers.Contract(
           KECCAK_DAO_CONTRACT_ADDRESS,
-          contractABI,
+          KECCAK_DAO_ABI,
           signer
         );
         console.log("Creating proposal..");

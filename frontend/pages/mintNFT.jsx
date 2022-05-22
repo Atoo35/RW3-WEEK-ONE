@@ -1,13 +1,15 @@
 
 import {useEffect, useState} from 'react';
 import {ethers, Contract} from 'ethers';
-import { KECCAK_NFT_CONTRACT_ADDRESS } from '../utils/constants';
+import { 
+  KECCAK_NFT_CONTRACT_ADDRESS,
+  KECCAK_NFT_ABI,
+} from '../utils/constants';
 import { useRouter } from 'next/router';
-import abi from '../../smart-contracts/artifacts/contracts/KeccakNFT.sol/KeccakNFT.json';
+
 
 export default function MintNFT(){
   const router = useRouter();
-  const contractABI = abi.abi
   const [currentAccount, setCurrentAccount] = useState("");
   const [nftMinted, setNftMinted] = useState(false)
 
@@ -18,8 +20,8 @@ export default function MintNFT(){
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner()
         const KeccakNFT = new Contract(
-          contractAddress,
-          contractABI,
+          KECCAK_NFT_CONTRACT_ADDRESS,
+          KECCAK_NFT_ABI,
           signer
         )
         const minted = await KeccakNFT.mint({
@@ -44,7 +46,7 @@ export default function MintNFT(){
         const accounts = await ethereum.request({method: "eth_requestAccounts"})
         const KeccakNFT = new Contract(
           KECCAK_NFT_CONTRACT_ADDRESS,
-          contractABI,
+          KECCAK_NFT_ABI,
           signer
         )
         const minted = await KeccakNFT.balanceOf(accounts[0])
