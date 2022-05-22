@@ -5,6 +5,8 @@ import {
   KECCAK_NFT_CONTRACT_ADDRESS,
   KECCAK_NFT_ABI,
   KECCAK_DAO_ABI,
+  TOPIC_CONTRACT_ADDRESS,
+  TOPIC_ABI,
 } from '../utils/constants'
 import { useRouter } from 'next/router';
 
@@ -15,7 +17,8 @@ const [proposals, setProposals] = useState([]);
 const [numProposals, setNumProposals] = useState("0")
 const [nftMinted, setNftMinted] = useState(false)
 const [proposalTopic, setProposalTopic] = useState("");
-  
+const [topic,setTopic] = useState("")
+
   const isWalletConnected = async () => {
     try {
       const { ethereum } = window;
@@ -79,6 +82,7 @@ const [proposalTopic, setProposalTopic] = useState("");
           disagree: proposals.disagree.toString(),
           executed: proposals.executed,
         };
+        console.log(parsedProposal)
         return parsedProposal;
       } else {
         alert("Metamask is not connected");
@@ -94,11 +98,29 @@ const [proposalTopic, setProposalTopic] = useState("");
       const proposals = [];
       for (let i = 0; i < numProposals; i++) {
         const proposal = await fetchProposalById(i);
-        console.log(proposal)
         proposals.push(proposal);
       }
       setProposals(proposals);
       return proposals;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const getTopic = async() =>{
+    try {
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const Topic = new ethers.Contract(
+        TOPIC_CONTRACT_ADDRESS,
+        TOPIC_ABI,
+        signer
+      );
+      
+      console.log("fetching current topic.");
+      const topic = await Topic.getTopic();
+      console.log(topic)
+      setTopic(topic);
     } catch (error) {
       console.error(error);
     }
@@ -165,8 +187,8 @@ const [proposalTopic, setProposalTopic] = useState("");
         console.log("Creating proposal..");
         const tx = await KeccakDAO.createProposal(proposalTopic);
         await tx.wait();
-        getNumProposalInDAO
-        getProposals();
+        await getNumProposalInDAO()
+        await getProposals();
         console.log("Proposal created: ", tx.hash);
       } else {
         alert("Metamask is not connected");
@@ -191,7 +213,7 @@ const [proposalTopic, setProposalTopic] = useState("");
           KECCAK_DAO_ABI,
           signer
         );
-        console.log("Creating proposal..");
+        console.log("Voting for proposal..");
         tx = await KeccakDAO.voteOnProposal(proposalId, vote);
         await tx.wait();
         console.log("Proposal Voted: ", tx.hash);
@@ -206,15 +228,44 @@ const [proposalTopic, setProposalTopic] = useState("");
     }
   }
 
+  const executeProposal = async (proposalId) => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const KeccakDAO = new ethers.Contract(
+          KECCAK_DAO_CONTRACT_ADDRESS,
+          KECCAK_DAO_ABI,
+          signer
+        );
+        console.log("Executing proposal..");
+        const tx = await KeccakDAO.executeProposal(proposalId);
+        await tx.wait();
+        await getTopic();
+        console.log("Proposal Executed: ", tx.hash);
+      } else {
+        alert("Metamask is not connected");
+      }
+
+    } catch (error) {
+      alert(error.reason);
+    }
+}
+
   useEffect(() => {
     isWalletConnected().then(()=>{
-      getMintedNFT();
-      getNumProposalInDAO();
-      getProposals();
-
+       getMintedNFT();
+       getNumProposalInDAO();
+       getProposals();
+       getTopic();
     });
   },[]);
 
+  useEffect(() => {
+    getNumProposalInDAO();
+    getProposals();
+  },[numProposals])
   
   return (
     <main>
@@ -223,6 +274,7 @@ const [proposalTopic, setProposalTopic] = useState("");
       /* TODO show each proposal with a button to vote*/
       <div>
         <h2>Welcome back</h2>
+        {topic?(<h3>Current Topic: {topic}</h3>):(<h3>No topic set</h3>)}
         {
         nftMinted?(
         // loop through every proposal
@@ -234,12 +286,22 @@ const [proposalTopic, setProposalTopic] = useState("");
               <div key={index} style={{border:"2px solid", "borderRadius":"5px", padding: "5px", margin: "5px"}}>
                 <p> Proposal topic: {proposal.newTopic}</p>
                 <p> Deadline: {proposal.deadline.toLocaleString()}</p>
-                <button type="button" onClick={() => voteProposal(proposal.proposalId,0)}>
-                  Vote for this proposal!
-                </button>
-                <button type="button" onClick={() => voteProposal(proposal.proposalId,1)}>
-                  Vote against this proposal!
-                </button>
+                
+                {proposal.deadline.toLocaleString() < new Date().toLocaleString()? (
+                  !proposal.executed?(
+                  <button onClick={()=>executeProposal(proposal.proposalId)}>Execute Proposal</button>
+                  ):<p>Proposal Already Executed/Denied.</p>
+                ):
+                (
+                  <div>
+                      <button type="button" onClick={() => voteProposal(proposal.proposalId,0)}>
+                        Vote for this proposal!
+                      </button>
+                      <button type="button" onClick={() => voteProposal(proposal.proposalId,1)}>
+                        Vote against this proposal!
+                      </button>
+                  </div>
+                )}
               </div>))
           }
           </div>

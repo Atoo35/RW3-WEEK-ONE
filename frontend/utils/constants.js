@@ -751,9 +751,53 @@ const KECCAK_DAO_ABI=[
     "type": "function"
   }
 ]
+const TOPIC_ABI=[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "topic",
+        "type": "string"
+      }
+    ],
+    "name": "ValueChanged",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "getTopic",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "newTopic",
+        "type": "string"
+      }
+    ],
+    "name": "storeTopic",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
+const TOPIC_CONTRACT_ADDRESS="0x83b43E3b40758E538a2689ebBE0c11582D0958C9"
 module.exports = {
   KECCAK_DAO_CONTRACT_ADDRESS,
   KECCAK_NFT_CONTRACT_ADDRESS,
   KECCAK_NFT_ABI,
-  KECCAK_DAO_ABI
+  KECCAK_DAO_ABI,
+  TOPIC_CONTRACT_ADDRESS,
+  TOPIC_ABI
 }
